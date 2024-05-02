@@ -14,6 +14,7 @@ public class PlayerManager : MonoBehaviour, IDamagable
     {
         Health = maxHealth;
         UpdateUI();
+        Application.targetFrameRate = 60;
     }
     
     public void TakeDamage(int damage)

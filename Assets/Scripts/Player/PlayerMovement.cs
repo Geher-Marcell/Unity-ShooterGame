@@ -14,6 +14,9 @@ public class PlayerMovement : MonoBehaviour
     private float _xDir;
     private float _yDir;
     
+    private bool doAirDrag = true;
+    private bool doLimitSpeed = true;
+    
     public void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
@@ -44,12 +47,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void LimitSpeed()
     {
+        if (!doLimitSpeed) return;
         if (_rb.velocity.magnitude > maxSpeed) _rb.velocity = _rb.velocity.normalized * maxSpeed;
     }
 
     private void ApplyAirDrag()
     {
         if (_xDir != 0 || _yDir != 0) return;
+        if (!doAirDrag) return;
         
         var velocity = _rb.velocity;
         velocity = new Vector2(velocity.x * (airDrag/100), velocity.y * (airDrag/100));
@@ -63,4 +68,8 @@ public class PlayerMovement : MonoBehaviour
         float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg - 90f;
         _rb.rotation = angle;
     }
+
+    public void SwitchAirDrag(bool newState) => doAirDrag = newState;
+    
+    public void SwitchLimitSpeed(bool newState) => doLimitSpeed = newState;
 }

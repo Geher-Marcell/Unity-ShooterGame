@@ -25,8 +25,8 @@ public class PlayerShooting : MonoBehaviour
     
     private void Shoot()
     {
-        var bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
-        bullet.GetComponent<Rigidbody2D>().velocity = transform.up * bulletSpeed;
+        var bullet = Instantiate(bulletPrefab, transform.position, transform.rotation).GetComponent<Rigidbody2D>();
+        bullet.velocity = transform.up * bulletSpeed;
     }
     
     private void OnDrawGizmos()
