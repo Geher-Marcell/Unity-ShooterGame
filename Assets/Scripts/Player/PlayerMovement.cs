@@ -16,6 +16,7 @@ public class PlayerMovement : MonoBehaviour
     
     private bool doAirDrag = true;
     private bool doLimitSpeed = true;
+    private bool canMove = true;
     
     public void Start()
     {
@@ -25,6 +26,7 @@ public class PlayerMovement : MonoBehaviour
     
     public void Update()
     {
+        if (!canMove) return;
         _xDir = Input.GetAxisRaw("Horizontal");
         _yDir = Input.GetAxisRaw("Vertical");
         
@@ -72,4 +74,6 @@ public class PlayerMovement : MonoBehaviour
     public void SwitchAirDrag(bool newState) => doAirDrag = newState;
     
     public void SwitchLimitSpeed(bool newState) => doLimitSpeed = newState;
+    
+    public void SwitchCanMove(bool newState) => canMove = newState;
 }

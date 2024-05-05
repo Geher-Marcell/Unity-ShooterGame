@@ -1,13 +1,17 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
+    [Header("Game Area")]
     public Vector2 gameAreaStart = new Vector2(-8, -4);
     public Vector2 gameAreaEnd = new Vector2(8, 4);
-
+    public float outOfBoundsTime = 3;
+    private float remainingOutOfBoundsTime = 0;
+    
     private Transform player;
     
     private void Awake()
@@ -24,20 +28,29 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        remainingOutOfBoundsTime = outOfBoundsTime;
         player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
     public void Update()
     {
-        if (player.position.x < gameAreaStart.x || player.position.x > gameAreaEnd.x ||
-            player.position.y < gameAreaStart.y || player.position.y > gameAreaEnd.y)
+        if (player.position.x < gameAreaStart.x || player.position.x > gameAreaEnd.x || player.position.y < gameAreaStart.y || player.position.y > gameAreaEnd.y)
         {
-            Vector2 dir = Vector2.zero - (Vector2) player.position;
-            
-            //TODO A player movementbe a velocity-t állítja valami miatt, ezért nem működik a visszatolás
-            
-            Debug.DrawLine(player.position, dir/2, Color.red);
-            player.GetComponent<Rigidbody2D>().AddForce(dir.normalized, ForceMode2D.Impulse);
+            if (remainingOutOfBoundsTime > 0)
+            {
+                remainingOutOfBoundsTime -= Time.deltaTime;
+                Debug.Log(Math.Ceiling(remainingOutOfBoundsTime));
+            }
+            else
+            {
+                // Kill player here
+                Debug.Log("Out of bounds for too long!");
+                SceneManager.LoadScene(0);
+            }
+        }
+        else
+        {
+            remainingOutOfBoundsTime = outOfBoundsTime;
         }
     }
 
