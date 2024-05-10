@@ -22,13 +22,18 @@ public class Bullet : MonoBehaviour
         Rb.AddForce(transform.up * speed, ForceMode2D.Impulse);
     }
 
+    [Obsolete("Obsolete")]
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.TryGetComponent(out IDamagable damagable))
-        {
-            if (other.CompareTag("Player")) return;
-            damagable.TakeDamage(damage);
-            Destroy(gameObject);
-        }
+        if (!other.TryGetComponent(out IDamagable damagable)) return;
+        if (other.CompareTag("Player")) return;
+
+        var t = transform;
+        var pos = t.position;
+        ParticleManager.Instance.PlayParticle(0, pos, t.rotation);
+        ParticleManager.Instance.PlayParticle(1, pos);
+            
+        damagable.TakeDamage(damage);
+        Destroy(gameObject);
     }
 }
