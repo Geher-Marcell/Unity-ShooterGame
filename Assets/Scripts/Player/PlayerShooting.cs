@@ -4,8 +4,7 @@ using UnityEngine;
 public class PlayerShooting : MonoBehaviour
 {
     [SerializeField] private GameObject bulletPrefab;
-    [SerializeField] private float bulletSpeed = 10f;
-    [SerializeField] private float fireRate = 0.5f;
+    [SerializeField] private float fireRate = 1f;
 
     private float _nextFire;
     
@@ -25,8 +24,7 @@ public class PlayerShooting : MonoBehaviour
     
     private void Shoot()
     {
-        var bullet = Instantiate(bulletPrefab, transform.position, transform.rotation).GetComponent<Rigidbody2D>();
-        bullet.velocity = transform.up * bulletSpeed;
+       Instantiate(bulletPrefab, transform.position, transform.rotation);
     }
     
     private void OnDrawGizmos()
