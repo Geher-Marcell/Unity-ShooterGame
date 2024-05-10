@@ -1,7 +1,6 @@
 using System;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -53,8 +52,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                // Kill player here
-                SceneManager.LoadScene(0);
+                player.GetComponent<PlayerManager>().Die();
             }
         }
         else

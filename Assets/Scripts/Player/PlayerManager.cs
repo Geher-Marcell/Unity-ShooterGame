@@ -1,6 +1,7 @@
 using Interfaces;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerManager : MonoBehaviour, IDamagable
 {
@@ -14,7 +15,6 @@ public class PlayerManager : MonoBehaviour, IDamagable
     {
         Health = maxHealth;
         UpdateUI();
-        Application.targetFrameRate = 60;
     }
     
     public void TakeDamage(int damage)
@@ -26,8 +26,7 @@ public class PlayerManager : MonoBehaviour, IDamagable
 
     public void Die()
     {
-        Debug.Log("Player died");
-        Destroy(gameObject);
+        SceneManager.LoadScene(0);
     }
 
     private void UpdateUI()
