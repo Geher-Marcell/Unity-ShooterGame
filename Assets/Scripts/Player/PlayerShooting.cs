@@ -13,7 +13,7 @@ public class PlayerShooting : MonoBehaviour
     
     private void Start()
     {
-        PoolManager.Instance.CreatePool("Bullet", bulletPrefab, 10, out _);
+        PoolManager.Instance.CreatePool("BulletPool", bulletPrefab, 10, out _);
     }
 
     void Update()

@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 namespace Managers
 {
@@ -7,6 +10,7 @@ namespace Managers
     {
         public static PoolManager Instance { get; private set; }
         
+        [SerializeField] private float cullInterval = 10f;
         [SerializeField] private List<Pool> pools = new List<Pool>();
         
         private void Awake()
@@ -15,6 +19,15 @@ namespace Managers
                 Instance = this;
             else
                 Destroy(gameObject);
+        }
+        
+        void Update()
+        {
+            for (int i = 0; i < pools.Count; i++)
+            {
+                if (Time.time - pools[i].LastTimeUsed > cullInterval)
+                    pools[i].CullInactiveObjects();
+            }
         }
         
         public void CreatePool(string name, GameObject prefab, int size, out Pool pool)
@@ -52,8 +65,11 @@ namespace Managers
         private int _startSize; //TODO reduce CurrentSize over time when objects are not used
         
         public int CurrentSize { get; private set; }
+        public float LastTimeUsed { get; private set; }
         
         List<GameObject> pool = new List<GameObject>();
+
+        private Transform parent;
         
         public Pool(string name, GameObject prefab, int startSize)
         {
@@ -62,20 +78,44 @@ namespace Managers
             _startSize = startSize;
             CurrentSize = 0;
             
+            parent = new GameObject(name).transform;
+            parent.parent = PoolManager.Instance.transform;
+            
             for (int i = 0; i < startSize; i++)
                 AddObjectToPool(Prefab);
         }
 
-        public GameObject GetObject(int index) => pool[index];
+        public GameObject GetObject(int index)
+        {
+            LastTimeUsed = Time.time;
+            return pool[index];   
+        }
         
         public void AddObjectToPool(GameObject prefab)
         {
-            var obj = Object.Instantiate(prefab);
+            var obj = Object.Instantiate(prefab, parent);
             obj.SetActive(false);
             pool.Add(obj);
             CurrentSize++;
         }
         
         public void AddObjectToPool() => AddObjectToPool(Prefab);
+        
+        public void CullInactiveObjects()
+        {
+            int cullAmount = CurrentSize - _startSize;
+            List<GameObject> toRemove = pool.Where(x => !x.activeInHierarchy).ToList();
+            
+            for (int i = 0; i < cullAmount; i++)
+            {
+                if (toRemove.Count == 0)
+                    break;
+                
+                Object.Destroy(toRemove[0]);
+                pool.Remove(toRemove[0]);
+                toRemove.RemoveAt(0);
+                CurrentSize--;
+            }
+        }
     }
 }
