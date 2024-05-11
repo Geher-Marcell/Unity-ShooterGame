@@ -32,14 +32,10 @@ public class PlayerShooting : MonoBehaviour
         
         for (int i = 0; i < fireAmount; i++)
         {
-            var bullet = PoolManager.Instance.GetObject(0);
+            var bullet = PoolManager.Instance.GetObject("BulletPool");
 
             if (bullet == null)
-            {
-                PoolManager.Instance.AddObjectToPool(0);
-                i--;
-                continue;
-            }
+                bullet = PoolManager.Instance.AddObjectToPool("BulletPool");
 
             var transform1 = transform;
             bullet.transform.position = transform1.position;
