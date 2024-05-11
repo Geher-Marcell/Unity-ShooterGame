@@ -5,6 +5,7 @@ public class PlayerShooting : MonoBehaviour
 {
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float fireRate = 1f;
+    [SerializeField] private int fireAmount = 1;
 
     private float _nextFire;
     
@@ -24,14 +25,15 @@ public class PlayerShooting : MonoBehaviour
     
     private void Shoot()
     {
-       Instantiate(bulletPrefab, transform.position, transform.rotation);
-    }
-    
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawRay(transform.position, transform.up * 2);
-        Gizmos.DrawRay(transform.position, Quaternion.Euler(0, 0, 30) * transform.up * 2);
-        Gizmos.DrawRay(transform.position, Quaternion.Euler(0, 0, -30) * transform.up * 2);
+        float startAngle = -((fireAmount - 1) * 15) / fireAmount;
+        float stepAngle = 30 / fireAmount;
+        
+        for (int i = 0; i < fireAmount; i++)
+        {
+            var bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+            var angle = fireAmount > 1 ? startAngle + i * stepAngle : 0;
+            
+            bullet.transform.Rotate(0, 0, angle);
+        }
     }
 }
