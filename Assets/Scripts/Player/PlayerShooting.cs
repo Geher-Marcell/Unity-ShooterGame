@@ -1,4 +1,6 @@
+using Managers;
 using UnityEngine;
+// ReSharper disable PossibleLossOfFraction
 
 [RequireComponent(typeof(PlayerManager))]
 public class PlayerShooting : MonoBehaviour
@@ -11,7 +13,7 @@ public class PlayerShooting : MonoBehaviour
     
     private void Start()
     {
-        Destroy(bulletPrefab, 2f);
+        PoolManager.Instance.CreatePool("Bullet", bulletPrefab, 10, out _);
     }
 
     void Update()
@@ -30,10 +32,24 @@ public class PlayerShooting : MonoBehaviour
         
         for (int i = 0; i < fireAmount; i++)
         {
-            var bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+            var bullet = PoolManager.Instance.GetObject(0);
+
+            if (bullet == null)
+            {
+                PoolManager.Instance.AddObjectToPool(0);
+                i--;
+                continue;
+            }
+
+            var transform1 = transform;
+            bullet.transform.position = transform1.position;
+            bullet.transform.rotation = transform1.rotation;
+            
             var angle = fireAmount > 1 ? startAngle + i * stepAngle : 0;
             
             bullet.transform.Rotate(0, 0, angle);
+            
+            bullet.SetActive(true);
         }
     }
 }

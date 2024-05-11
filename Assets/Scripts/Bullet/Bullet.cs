@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Interfaces;
 using UnityEngine;
 
@@ -14,12 +12,18 @@ public class Bullet : MonoBehaviour
     
     public Rigidbody2D Rb { get; private set; }
     
-    private void Start()
+    private void OnEnable()
     {
         Rb = GetComponent<Rigidbody2D>();
-        Destroy(gameObject, lifeTime);
+        
+        Invoke(nameof(Deactivate), lifeTime);
         
         Rb.AddForce(transform.up * speed, ForceMode2D.Impulse);
+    }
+
+    private void OnDisable()
+    {
+        CancelInvoke(nameof(Deactivate));
     }
 
     [Obsolete("Obsolete")]
@@ -34,6 +38,9 @@ public class Bullet : MonoBehaviour
         ParticleManager.Instance.PlayParticle(1, pos);
             
         damagable.TakeDamage(damage);
-        Destroy(gameObject);
+
+        Deactivate();
     }
+    
+    void Deactivate() => gameObject.SetActive(false);
 }
