@@ -5,6 +5,13 @@ using UnityEngine;
 
 public class ParticleManager : MonoBehaviour
 {
+    public enum ParticleType
+    {
+        FlyOff = 0,
+        Impact = 1,
+        EnemyDeath = 2
+    }
+    
     private List<Transform> particleList = new List<Transform>();
         
     public static ParticleManager Instance { get; private set; }

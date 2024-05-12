@@ -1,5 +1,6 @@
 using System;
 using Interfaces;
+using Managers;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -33,7 +34,12 @@ namespace Enemy
                 Die();
         }
 
-        public void Die() => gameObject.SetActive(false);
+        public void Die()
+        {
+            ParticleManager.Instance.PlayParticle((int)ParticleManager.ParticleType.EnemyDeath, transform.position, transform.rotation);
+            GameManager.Instance.DropXp(transform.position, 1);
+            gameObject.SetActive(false);
+        }
 
         public virtual void Start()
         {

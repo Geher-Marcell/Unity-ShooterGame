@@ -34,8 +34,8 @@ public class Bullet : MonoBehaviour
 
         var t = transform;
         var pos = t.position;
-        ParticleManager.Instance.PlayParticle(0, pos, t.rotation);
-        ParticleManager.Instance.PlayParticle(1, pos);
+        ParticleManager.Instance.PlayParticle((int) ParticleManager.ParticleType.FlyOff, pos, t.rotation);
+        ParticleManager.Instance.PlayParticle((int) ParticleManager.ParticleType.Impact, pos);
             
         damagable.TakeDamage(damage);
 
