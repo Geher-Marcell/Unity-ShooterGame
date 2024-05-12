@@ -18,7 +18,6 @@ public class GameManager : MonoBehaviour
     public float outOfBoundsTime = 3;
     private float remainingOutOfBoundsTime = 0;
     
-    
     private Transform player;
     
     private void Awake()

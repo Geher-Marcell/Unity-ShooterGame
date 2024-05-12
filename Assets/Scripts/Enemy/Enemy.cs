@@ -14,6 +14,8 @@ namespace Enemy
         [SerializeField] private float acceleration = 2f;
         [SerializeField] private float airDrag = 95f;
         
+        private float currentHealth = 0;
+        
         [Space(10)]
         [SerializeField] private ParticleSystem deathParticles;
         [SerializeField] private ParticleSystem hitParticles;
@@ -26,12 +28,12 @@ namespace Enemy
 
         public void TakeDamage(int damage)
         {
-            health -= damage;
-            if (health <= 0)
+            currentHealth -= damage;
+            if (currentHealth <= 0)
                 Die();
         }
 
-        public void Die() => Destroy(gameObject);
+        public void Die() => gameObject.SetActive(false);
 
         public virtual void Start()
         {
@@ -44,7 +46,12 @@ namespace Enemy
             LimitSpeed();
             ApplyAirDrag();
         }
-        
+
+        public void OnEnable()
+        {
+            currentHealth = health;
+        }
+
         private void LimitSpeed()
         {
             if (Rb.velocity.magnitude > maxSpeed) Rb.velocity = Rb.velocity.normalized * maxSpeed;
