@@ -1,5 +1,6 @@
 using System;
 using Managers;
+using Player;
 using TMPro;
 using UnityEngine;
 
@@ -21,6 +22,19 @@ public class GameManager : MonoBehaviour
 
     [Header("Experience System")] 
     [SerializeField] private GameObject xpOrb;
+    public int CurrentLevel { get; private set; } = 1;
+    public int CurrentExp { get; private set; } = 0;
+    [SerializeField] private AnimationCurve xpPerLevel;
+    
+    public int RequiredExp => Mathf.RoundToInt(xpPerLevel.Evaluate(CurrentLevel));
+    
+    //Events
+    
+    public delegate void ExpCollected();
+    public static event ExpCollected OnExpCollected;
+    
+    public delegate void LevelUp();
+    public static event LevelUp OnLevelUp;
     
     private void Awake()
     {
@@ -36,12 +50,11 @@ public class GameManager : MonoBehaviour
         UpdateOutOfBoundsUI(false);
         
         player = GameObject.FindGameObjectWithTag("Player").transform;
+        
+        PoolManager.Instance.CreatePool(xpOrb.name, xpOrb, 10, out _);
     }
 
-    public void Update()
-    {
-        CheckOutOfBounds();
-    }
+    public void Update() => CheckOutOfBounds();
 
     private void CheckOutOfBounds()
     {
@@ -53,7 +66,7 @@ public class GameManager : MonoBehaviour
                 UpdateOutOfBoundsUI(true);
             }
             else
-                player.GetComponent<PlayerManager>().Die();
+                player.GetComponent<PlayerStats>().Die();
         }
         else
         {
@@ -86,17 +99,30 @@ public class GameManager : MonoBehaviour
     }
     
     //XP System
-    public void DropXp(Vector2 position, int amount)
+    public void DropXp(Vector2 position)
     {
-        Instantiate(xpOrb, position, Quaternion.identity);
+        var xp = PoolManager.Instance.GetObject(xpOrb.name);
+
+        if (xp == null)
+            xp = PoolManager.Instance.AddObjectToPool(xpOrb.name);
+        
+        xp.transform.position = position;
+        xp.SetActive(true);
+    }
+
+    public void AddExp(int expAmount)
+    {
+        CurrentExp += expAmount;
+        OnExpCollected?.Invoke();
+        CheckLevelUp();
     }
     
-    private void OnDrawGizmos()
+    private void CheckLevelUp()
     {
-        Gizmos.color = Color.green;
-        Gizmos.DrawLine(new Vector2(gameAreaStart.x, gameAreaStart.y), new Vector2(gameAreaEnd.x, gameAreaStart.y));
-        Gizmos.DrawLine(new Vector2(gameAreaEnd.x, gameAreaStart.y), new Vector2(gameAreaEnd.x, gameAreaEnd.y));
-        Gizmos.DrawLine(new Vector2(gameAreaEnd.x, gameAreaEnd.y), new Vector2(gameAreaStart.x, gameAreaEnd.y));
-        Gizmos.DrawLine(new Vector2(gameAreaStart.x, gameAreaEnd.y), new Vector2(gameAreaStart.x, gameAreaStart.y));
+        if (CurrentExp < RequiredExp) return;
+        
+        CurrentExp -= RequiredExp;
+        CurrentLevel++;
+        OnLevelUp?.Invoke();
     }
 }

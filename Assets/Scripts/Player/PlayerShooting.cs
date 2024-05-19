@@ -1,4 +1,5 @@
 using Managers;
+using Player;
 using UnityEngine;
 // ReSharper disable PossibleLossOfFraction
 
@@ -6,31 +7,35 @@ using UnityEngine;
 public class PlayerShooting : MonoBehaviour
 {
     [SerializeField] private GameObject bulletPrefab;
-    [SerializeField] private float fireRate = 1f;
-    [SerializeField] private int fireAmount = 1;
+    private float _fireRate ;
+    private int _fireAmount;
 
     private float _nextFire;
     
     private void Start()
     {
         PoolManager.Instance.CreatePool("BulletPool", bulletPrefab, 10, out _);
+        
+        var playerStats = GetComponent<PlayerStats>();
+        _fireRate = playerStats.FireRate;
+        _fireAmount = playerStats.FireAmount;
     }
 
     void Update()
     {
         if (Input.GetButton("Fire1") && Time.time > _nextFire)
         {
-            _nextFire = Time.time + fireRate;
+            _nextFire = Time.time + _fireRate;
             Shoot();
         }        
     }
     
     private void Shoot()
     {
-        float startAngle = -((fireAmount - 1) * 15) / fireAmount;
-        float stepAngle = 30 / fireAmount;
+        float startAngle = -((_fireAmount - 1) * 15) / _fireAmount;
+        float stepAngle = 30 / _fireAmount;
         
-        for (int i = 0; i < fireAmount; i++)
+        for (int i = 0; i < _fireAmount; i++)
         {
             var bullet = PoolManager.Instance.GetObject("BulletPool");
 
@@ -41,7 +46,7 @@ public class PlayerShooting : MonoBehaviour
             bullet.transform.position = transform1.position;
             bullet.transform.rotation = transform1.rotation;
             
-            var angle = fireAmount > 1 ? startAngle + i * stepAngle : 0;
+            var angle = _fireAmount > 1 ? startAngle + i * stepAngle : 0;
             
             bullet.transform.Rotate(0, 0, angle);
             

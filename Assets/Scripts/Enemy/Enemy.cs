@@ -37,7 +37,7 @@ namespace Enemy
         public void Die()
         {
             ParticleManager.Instance.PlayParticle((int)ParticleManager.ParticleType.EnemyDeath, transform.position, transform.rotation);
-            GameManager.Instance.DropXp(transform.position, 1);
+            GameManager.Instance.DropXp(transform.position);
             gameObject.SetActive(false);
         }
 
