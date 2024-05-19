@@ -3,6 +3,7 @@ using Managers;
 using Player;
 using TMPro;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
@@ -25,16 +26,18 @@ public class GameManager : MonoBehaviour
     public int CurrentLevel { get; private set; } = 1;
     public int CurrentExp { get; private set; } = 0;
     [SerializeField] private AnimationCurve xpPerLevel;
-    
     public int RequiredExp => Mathf.RoundToInt(xpPerLevel.Evaluate(CurrentLevel));
     
-    //Events
+    [Header("Upgrades")]
+    public UpgradeOption[] upgradeOptions;
     
+    //Events
     public delegate void ExpCollected();
     public static event ExpCollected OnExpCollected;
     
     public delegate void LevelUp();
     public static event LevelUp OnLevelUp;
+    
     
     private void Awake()
     {
@@ -48,6 +51,7 @@ public class GameManager : MonoBehaviour
     {
         remainingOutOfBoundsTime = outOfBoundsTime;
         UpdateOutOfBoundsUI(false);
+        PopulateUpgrades();
         
         player = GameObject.FindGameObjectWithTag("Player").transform;
         
@@ -124,5 +128,40 @@ public class GameManager : MonoBehaviour
         CurrentExp -= RequiredExp;
         CurrentLevel++;
         OnLevelUp?.Invoke();
+        
+        UpgradeOption chosenUpgrade = upgradeOptions[Random.Range(0, upgradeOptions.Length)];
+        chosenUpgrade.onUpgrade?.Invoke(); // Apply the upgrade effect
     }
+
+    private void PopulateUpgrades()
+    {
+        upgradeOptions = new UpgradeOption[]
+        {
+            new()
+            {
+                upgradeName = "Health Upgrade",
+                description = "Increases the player's health by 10",
+                onUpgrade = () => Debug.Log("Health upgraded by 10")
+            },
+            new()
+            {
+                upgradeName = "Damage Upgrade",
+                description = "Increases the player's damage by 5",
+                onUpgrade = () => Debug.Log("Damage upgraded by 5")
+            },
+            new()
+            {
+                upgradeName = "Fire Rate Upgrade",
+                description = "Increases the player's fire rate by 0.1",
+                onUpgrade = () => Debug.Log("Fire rate upgraded by 0.1")
+            }
+        };
+    }
+}
+
+public class UpgradeOption
+{
+    public string upgradeName; // Name displayed to the player
+    public string description; // Description of the upgrade's effect
+    public Action onUpgrade; // Delegate to handle the upgrade effect 
 }

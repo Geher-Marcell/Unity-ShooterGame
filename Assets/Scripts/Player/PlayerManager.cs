@@ -51,12 +51,14 @@ public class PlayerManager : MonoBehaviour
     private void OnEnable()
     {
         GameManager.OnExpCollected += UpdateUI;
+        GameManager.OnLevelUp += UpdateUI;
         PlayerStats.OnDamageTaken += UpdateUI;
     }
     
     private void OnDisable()
     {
         GameManager.OnExpCollected -= UpdateUI;
+        GameManager.OnLevelUp -= UpdateUI;
         PlayerStats.OnDamageTaken -= UpdateUI;
     }
 }
