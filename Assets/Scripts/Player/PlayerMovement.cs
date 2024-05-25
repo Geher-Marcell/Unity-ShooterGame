@@ -28,13 +28,16 @@ public class PlayerMovement : MonoBehaviour
         _xDir = Input.GetAxisRaw("Horizontal");
         _yDir = Input.GetAxisRaw("Vertical");
         
-        LimitSpeed();
-        ApplyAirDrag();
-        
         Rotate();
     }
 
-    public void FixedUpdate() => Move();
+    public void FixedUpdate()
+    {
+        LimitSpeed();
+        ApplyAirDrag();
+        
+        Move();
+    }
 
     private void Move()
     {

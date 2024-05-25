@@ -1,3 +1,4 @@
+using System;
 using Managers;
 using Player;
 using UnityEngine;
@@ -52,5 +53,22 @@ public class PlayerShooting : MonoBehaviour
             
             bullet.SetActive(true);
         }
+    }
+
+    private void OnLevelUp()
+    {
+        var playerStats = GetComponent<PlayerStats>();
+        _fireRate = playerStats.FireRate;
+        _fireAmount = playerStats.FireAmount;
+    }
+    
+    private void OnEnable()
+    {
+        GameManager.OnLevelUp += OnLevelUp;
+    }
+    
+    private void OnDisable()
+    {
+        GameManager.OnLevelUp -= OnLevelUp;
     }
 }

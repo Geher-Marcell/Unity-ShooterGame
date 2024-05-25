@@ -9,7 +9,7 @@ namespace Player
         public float attractForce = 10;
         private List<Transform> _xpOrbs = new List<Transform>();
 
-        private void Update()
+        private void FixedUpdate()
         {
             if(_xpOrbs.Count == 0) return;
             foreach (var orb in _xpOrbs)

@@ -1,8 +1,11 @@
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Managers;
 using Player;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
@@ -29,7 +32,8 @@ public class GameManager : MonoBehaviour
     public int RequiredExp => Mathf.RoundToInt(xpPerLevel.Evaluate(CurrentLevel));
     
     [Header("Upgrades")]
-    public UpgradeOption[] upgradeOptions;
+    [SerializeField] private GameObject upgradePanel;
+    private UpgradeOption[] upgradeOptions;
     
     //Events
     public delegate void ExpCollected();
@@ -59,7 +63,8 @@ public class GameManager : MonoBehaviour
     }
 
     public void Update() => CheckOutOfBounds();
-
+    
+#region BoundChecks
     private void CheckOutOfBounds()
     {
         if (IsOutOfBounds(player))
@@ -101,8 +106,9 @@ public class GameManager : MonoBehaviour
                 pos.y < gameAreaStart.y ||
                 pos.y > gameAreaEnd.y);
     }
-    
-    //XP System
+#endregion
+
+#region XP System
     public void DropXp(Vector2 position)
     {
         var xp = PoolManager.Instance.GetObject(xpOrb.name);
@@ -127,36 +133,65 @@ public class GameManager : MonoBehaviour
         
         CurrentExp -= RequiredExp;
         CurrentLevel++;
-        OnLevelUp?.Invoke();
         
-        UpgradeOption chosenUpgrade = upgradeOptions[Random.Range(0, upgradeOptions.Length)];
-        chosenUpgrade.onUpgrade?.Invoke(); // Apply the upgrade effect
+        ShowUpgradeOptions(); //The level up event is handled in the buttons of the upgrade panel
+    }
+#endregion
+
+#region Upgrades
+    private void ShowUpgradeOptions()
+    {
+        upgradePanel.SetActive(true);
+        Time.timeScale = 0;
+        
+        var children = upgradePanel.GetComponentsInChildren<Transform>().Where(t => t.parent == upgradePanel.transform).ToList();
+
+        foreach (var c in children)
+        {
+            var option = upgradeOptions[Random.Range(0, upgradeOptions.Length)]; //Select a random upgrade
+            
+            c.GetChild(0).GetComponent<Image>().sprite = Resources.Load<Sprite>("Upgrades/" + option.upgradeName);
+            c.GetChild(1).GetComponent<TMP_Text>().text = option.upgradeName;
+            c.GetChild(2).GetComponent<TMP_Text>().text = option.description;
+            
+            c.GetComponent<Button>().onClick.RemoveAllListeners();
+            c.GetComponent<Button>().onClick.AddListener(() =>
+            {
+                option.onUpgrade?.Invoke();
+                Time.timeScale = 1;
+                upgradePanel.SetActive(false);
+                OnLevelUp?.Invoke();
+            });
+        }
     }
 
     private void PopulateUpgrades()
     {
+        var playerStats = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerStats>();
+        
         upgradeOptions = new UpgradeOption[]
         {
             new()
             {
-                upgradeName = "Health Upgrade",
+                upgradeName = "Health",
                 description = "Increases the player's health by 10",
-                onUpgrade = () => Debug.Log("Health upgraded by 10")
+                onUpgrade = () =>
+                {
+                    playerStats.MaxHealth += 10;
+                    playerStats.Health += 10;
+                }
             },
             new()
             {
-                upgradeName = "Damage Upgrade",
-                description = "Increases the player's damage by 5",
-                onUpgrade = () => Debug.Log("Damage upgraded by 5")
-            },
-            new()
-            {
-                upgradeName = "Fire Rate Upgrade",
+                upgradeName = "Fire Rate",
                 description = "Increases the player's fire rate by 0.1",
-                onUpgrade = () => Debug.Log("Fire rate upgraded by 0.1")
+                onUpgrade = () => playerStats.FireRate -= 0.1f
             }
         };
     }
+#endregion
+
+    private async Task WaitForBoolResultAsync(Func<Task> action) => await action();
 }
 
 public class UpgradeOption
