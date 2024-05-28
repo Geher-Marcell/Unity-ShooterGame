@@ -51,6 +51,8 @@ public class PlayerShooting : MonoBehaviour
             
             bullet.transform.Rotate(0, 0, angle);
             
+            SoundManager.Instance.PlaySFX("Shoot");
+            
             bullet.SetActive(true);
         }
     }

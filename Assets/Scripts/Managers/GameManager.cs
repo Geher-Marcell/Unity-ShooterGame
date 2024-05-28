@@ -124,6 +124,7 @@ public class GameManager : MonoBehaviour
     {
         CurrentExp += expAmount;
         OnExpCollected?.Invoke();
+        SoundManager.Instance.PlaySFX("Pickup");
         CheckLevelUp();
     }
     
@@ -133,6 +134,8 @@ public class GameManager : MonoBehaviour
         
         CurrentExp -= RequiredExp;
         CurrentLevel++;
+        
+        SoundManager.Instance.PlaySFX("LevelUp");
         
         ShowUpgradeOptions(); //The level up event is handled in the buttons of the upgrade panel
     }
@@ -186,6 +189,12 @@ public class GameManager : MonoBehaviour
                 upgradeName = "Fire Rate",
                 description = "Increases the player's fire rate by 0.1",
                 onUpgrade = () => playerStats.FireRate -= 0.1f
+            },
+            new()
+            {
+                upgradeName = "+1 Bullet",
+                description = "Increases the player's bullet count by 1",
+                onUpgrade = () => playerStats.FireAmount++
             }
         };
     }

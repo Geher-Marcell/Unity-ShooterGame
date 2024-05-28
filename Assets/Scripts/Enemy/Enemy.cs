@@ -30,6 +30,7 @@ namespace Enemy
         public void TakeDamage(int damage)
         {
             currentHealth -= damage;
+            SoundManager.Instance.PlaySFX("Hit");
             if (currentHealth <= 0)
                 Die();
         }
