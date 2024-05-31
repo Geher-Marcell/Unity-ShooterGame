@@ -6,15 +6,24 @@ namespace Player
 {
     public class PlayerStats : MonoBehaviour, IDamagable
     {
+        public static PlayerStats Instance;
+        
         public int MaxHealth;
         public int Health;
         public float FireRate;
         public int FireAmount;
+        public int Damage;
+        public float PushForce;
         
         public delegate void DamageTaken();
         public static event DamageTaken OnDamageTaken;
-        
-        private void Awake() => Health = MaxHealth;
+
+        private void Awake()
+        {
+            Health = MaxHealth;
+            if (Instance == null) Instance = this;
+            else Destroy(gameObject);
+        }
         
         public void TakeDamage(int damage)
         {

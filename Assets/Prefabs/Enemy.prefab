@@ -48,8 +48,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 100
-  maxSpeed: 4
-  acceleration: 2
+  maxSpeed: 7
+  acceleration: 7
   airDrag: 95
   deathParticles: {fileID: 0}
   hitParticles: {fileID: 0}

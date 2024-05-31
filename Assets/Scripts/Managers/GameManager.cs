@@ -24,6 +24,10 @@ public class GameManager : MonoBehaviour
     public float outOfBoundsTime = 3;
     private float remainingOutOfBoundsTime = 0;
 
+    [Header("PauseMenu")]
+    [SerializeField] private GameObject pauseMenu;
+    [SerializeField] private KeyCode pauseKey = KeyCode.Escape;
+    
     [Header("Experience System")] 
     [SerializeField] private GameObject xpOrb;
     public int CurrentLevel { get; private set; } = 1;
@@ -57,12 +61,18 @@ public class GameManager : MonoBehaviour
         UpdateOutOfBoundsUI(false);
         PopulateUpgrades();
         
+        pauseMenu.SetActive(false);
+        
         player = GameObject.FindGameObjectWithTag("Player").transform;
         
         PoolManager.Instance.CreatePool(xpOrb.name, xpOrb, 10, out _);
     }
 
-    public void Update() => CheckOutOfBounds();
+    public void Update()
+    {
+        CheckOutOfBounds();
+        if(Input.GetKeyDown(pauseKey)) Pause(true);
+    }
     
 #region BoundChecks
     private void CheckOutOfBounds()
@@ -106,6 +116,21 @@ public class GameManager : MonoBehaviour
                 pos.y < gameAreaStart.y ||
                 pos.y > gameAreaEnd.y);
     }
+#endregion
+
+#region Pause Menu
+
+private void Pause(bool pause = true)
+{
+    if(upgradePanel.activeSelf) return;
+    if(pauseMenu.activeSelf == pause) return;   
+    Time.timeScale = pause ? 0 : 1;
+    pauseMenu.SetActive(pause);
+}
+
+public void Resume() => Pause(false);
+public void Quit() => Application.Quit();
+
 #endregion
 
 #region XP System

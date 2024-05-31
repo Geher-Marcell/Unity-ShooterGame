@@ -1,5 +1,6 @@
 using System;
 using Interfaces;
+using Player;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -7,10 +8,13 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     [SerializeField] private float speed = 10;
-    [SerializeField] private int damage = 10;
+    private int damage = 10;
+    private float pushForce = 5;
     [SerializeField] private float lifeTime = 5;
+
+    private Rigidbody2D Rb;
     
-    public Rigidbody2D Rb { get; private set; }
+    private PlayerStats _playerStats = null;
     
     private void OnEnable()
     {
@@ -18,6 +22,11 @@ public class Bullet : MonoBehaviour
         
         Invoke(nameof(Deactivate), lifeTime);
         
+        if(_playerStats == null)
+            _playerStats = PlayerStats.Instance;
+        
+        damage = _playerStats.Damage;
+        pushForce = _playerStats.PushForce;
         Rb.AddForce(transform.up * speed, ForceMode2D.Impulse);
     }
 
@@ -25,7 +34,7 @@ public class Bullet : MonoBehaviour
     {
         CancelInvoke(nameof(Deactivate));
     }
-
+    
     [Obsolete("Obsolete")]
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -36,8 +45,10 @@ public class Bullet : MonoBehaviour
         var pos = t.position;
         ParticleManager.Instance.PlayParticle((int) ParticleManager.ParticleType.FlyOff, pos, t.rotation);
         ParticleManager.Instance.PlayParticle((int) ParticleManager.ParticleType.Impact, pos);
-            
+        
         damagable.TakeDamage(damage);
+        if (other.TryGetComponent(out Rigidbody2D rb))
+            rb.AddForce(transform.up * pushForce, ForceMode2D.Impulse);
 
         Deactivate();
     }
