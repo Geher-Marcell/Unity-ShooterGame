@@ -51,6 +51,9 @@ MonoBehaviour:
   maxSpeed: 7
   acceleration: 7
   airDrag: 95
+  damage: 10
+  pushForce: 100
+  attackRate: 1
   deathParticles: {fileID: 0}
   hitParticles: {fileID: 0}
 --- !u!61 &6138440743820536471

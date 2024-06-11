@@ -220,6 +220,12 @@ public void Quit() => Application.Quit();
                 upgradeName = "+1 Bullet",
                 description = "Increases the player's bullet count by 1",
                 onUpgrade = () => playerStats.FireAmount++
+            },
+            new()
+            {
+                upgradeName = "Damage",
+                description = "Increases the player's damage by 5",
+                onUpgrade = () => playerStats.Damage += 5
             }
         };
     }

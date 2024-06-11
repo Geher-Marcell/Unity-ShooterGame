@@ -28,6 +28,7 @@ namespace Player
         public void TakeDamage(int damage)
         {
             Health -= damage;
+            OnDamageTaken?.Invoke();
             if (Health <= 0) Die();
         }
 
